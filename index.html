@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rifa 3° EMTI - Cesta de Guloseimas</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="hero">
+    <img class="hero-logo" src="logo sala.png" alt="Logo da turma" />
+    <h1>RIFA 3° EMTI</h1>
+    <p class="prize">
+      <svg class="trophy" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M8 21h8M12 17v4M7 4h10v6a5 5 0 0 1-10 0V4Z" stroke="#fbbf24" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Prêmio: Cesta de Guloseimas
+    </p>
+
+    <div class="authbar">
+      <button class="btn-login" id="btnLogin" type="button">Entrar / Cadastrar</button>
+      <div class="user-info" id="userInfo" style="display:none;">
+        <span>Olá, <strong id="userName"></strong></span>
+        <button class="btn-sair" id="logoutBtn" type="button">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="stats-card">
+    <div class="stat">
+      <div class="num" id="statTotal">500</div>
+      <div class="lbl">Fichas totais</div>
+    </div>
+    <div class="stat">
+      <div class="num" id="statReserved">0</div>
+      <div class="lbl">Reservadas</div>
+    </div>
+    <div class="stat">
+      <div class="num" id="statRest">500</div>
+      <div class="lbl">Disponíveis</div>
+    </div>
+    <div class="stat">
+      <div class="num" id="statPrice">R$ 3,00</div>
+      <div class="lbl">Valor / ficha</div>
+    </div>
+  </section>
+
+  <main class="container">
+    <section class="rules">
+      <h3>Como participar</h3>
+      <ul>
+        <li>Escolha uma ficha disponível no quadro abaixo.</li>
+        <li>Entre em contato pelo WhatsApp com nossas Assessoras Mariana e Jeissiany.</li>
+        <li>Informe o número da ficha que deseja comprar para nossas Assessoras.</li>
+        <li>Após o pagamento, uma das Assessoras confirmará sua reserva.</li>
+        <li>O sorteio será realizado na data de 30/09.</li>
+      </ul>
+      <span class="rules-warn" aria-hidden="true">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
+          <defs>
+            <linearGradient id="warnGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#f87171"/>
+              <stop offset="100%" stop-color="#dc2626"/>
+            </linearGradient>
+          </defs>
+          <circle cx="12" cy="12" r="11" fill="url(#warnGrad)"/>
+          <circle cx="12" cy="12" r="11" stroke="#fff" stroke-width="1.6" stroke-dasharray="3 3" opacity=".7"/>
+          <path d="M12 6.5v7" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+          <circle cx="12" cy="16.8" r="1.35" fill="#fff"/>
+        </svg>
+      </span>
+    </section>
+
+<!-- MEUS TICKETS -->
+    <section class="my-tickets" id="myTicketsSection" style="display:none;">
+      <div class="my-tickets-head">
+        <button class="btn-toggle-tickets" id="btnToggleTickets" type="button">Ocultar tickets</button>
+      </div>
+      <div class="tickets-list" id="myTicketsList"></div>
+    </section>
+    <!-- FIM MEUS TICKETS -->
+
+    <div class="grid-actions" id="actionsTop">
+      <button class="btn-action" id="btnToggle" type="button">Ver mais fichas</button>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="legend">
+      <div class="item"><span class="dot available"></span> Disponível</div>
+      <div class="item"><span class="dot reserved"></span> Reservada</div>
+      <div class="item"><span class="dot sold"></span> Vendida</div>
+    </div>
+  </main>
+
+  <div class="overlay" id="loginOverlay">
+    <div class="modal auth-modal" role="dialog" aria-modal="true">
+      <h2>Acesso à compra</h2>
+      <p class="auth-msg" id="loginMsg"></p>
+      <div class="tabs">
+        <button type="button" id="tabLogin" class="tab active">Entrar</button>
+        <button type="button" id="tabRegister" class="tab">Cadastrar</button>
+      </div>
+
+      <form id="loginForm" novalidate>
+        <label for="loginCelular">Número de celular</label>
+        <input type="tel" id="loginCelular" autocomplete="tel" placeholder="(11) 91234-5678" required />
+        <label for="loginSenha">Senha</label>
+        <div class="pass-wrap">
+          <input type="password" id="loginSenha" autocomplete="current-password" required />
+          <button type="button" class="pass-toggle" id="toggleLoginSenha" tabindex="-1" aria-label="Mostrar senha">👁</button>
+        </div>
+        <p class="error" id="loginError"></p>
+        <button class="submit" type="submit">Entrar</button>
+      </form>
+
+      <form id="registerForm" novalidate style="display:none;">
+        <label for="regNome">Nome completo</label>
+        <input type="text" id="regNome" autocomplete="name" placeholder="Seu nome completo" required />
+        <label for="regIdade">Idade</label>
+        <input type="number" id="regIdade" min="1" max="120" autocomplete="bday" required />
+        <label for="regCelular">Número de celular</label>
+        <input type="tel" id="regCelular" autocomplete="tel" placeholder="(11) 91234-5678" required />
+        <label for="regSenha">Senha</label>
+        <div class="pass-wrap">
+          <input type="password" id="regSenha" autocomplete="new-password" required />
+          <button type="button" class="pass-toggle" id="toggleRegSenha" tabindex="-1" aria-label="Mostrar senha">👁</button>
+        </div>
+        <p class="error" id="regError"></p>
+        <button class="submit" type="submit">Cadastrar</button>
+      </form>
+
+      <button class="close" id="closeLoginBtn" type="button">Fechar</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="number-badge" id="modalNumber">1</div>
+      <h2>Ficha <span id="modalNumberText">#001</span></h2>
+      <p class="price">Valor da ficha: <strong>R$ 3,00</strong></p>
+      <p class="cta-label">Fale com uma das nossas Assessoras para concluir sua compra:</p>
+      <div id="sellerButtons"></div>
+      <button class="close" id="closeBtn">Fechar</button>
+    </div>
+  </div>
+
+  <!-- Tela de vencedor com confete -->
+  <div id="winnerCelebration">
+    <div class="winner-confetti" id="winnerConfetti"></div>
+    <div class="winner-content">
+      <div class="winner-trophy">🏆</div>
+      <h1 class="winner-title">VOCÊ GANHOU!</h1>
+      <p class="winner-sub">Sua ficha <span id="winnerNumText">#000</span> foi sorteada!</p>
+      <button class="winner-close" id="winnerCloseBtn" type="button">Ver minha ficha</button>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-actions">
+      <a class="admin-link" id="adminOpenBtn" href="admin.html" style="display:none;">Painel Administrativo</a>
+      <button class="btn-sair" id="deleteAccountBtn" type="button" style="display:none;">Deletar conta</button>
+    </div>
+  </footer>
+<!-- Modal de confirmação: deletar conta -->
+  <div id="delModal" style="display:none;position:fixed;inset:0;background:rgba(3,7,18,.72);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:linear-gradient(160deg,#1e293b,#0f172a);border:1px solid rgba(248,113,113,.5);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 40px rgba(248,113,113,.15);max-width:440px;width:92%;padding:28px 24px;text-align:center;box-sizing:border-box;">
+      <p style="font-size:1.9rem;margin:0 0 12px;">🗑️</p>
+      <p style="font-weight:800;font-size:1.05rem;color:#fff;margin:0 0 10px;">Atenção: esta ação é irreversível.</p>
+      <p style="font-size:.9rem;color:#94a3b8;line-height:1.5;margin:0 0 18px;">Sua conta será excluída permanentemente, junto com seus dados e reservas pendentes. Após a confirmação não será possível recuperar.</p>
+      <p style="font-size:.95rem;color:#fbbf24;font-weight:700;margin:0 0 18px;" id="delMeta"></p>
+      <input id="delPass" type="password" placeholder="Digite sua senha" disabled style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(148,163,184,.3);background:rgba(15,23,42,.6);color:#fff;font:600 1rem 'Segoe UI',sans-serif;text-align:center;margin:0 0 8px;outline:none;box-sizing:border-box;" />
+      <p id="delError" style="font-size:.85rem;color:#f87171;margin:0 0 14px;min-height:1.2em;font-weight:600;"></p>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button id="delYes" disabled style="padding:11px 20px;border:none;border-radius:11px;cursor:pointer;font:700 .92rem 'Segoe UI',sans-serif;color:#fff;background:linear-gradient(135deg,#ef4444,#dc2626);opacity:.5;transition:opacity .2s,transform .2s;">Aguardando 10s…</button>
+        <button id="delNo" style="padding:11px 20px;border:1px solid rgba(148,163,184,.35);border-radius:11px;cursor:pointer;font:700 .92rem 'Segoe UI',sans-serif;color:#e2e8f0;background:rgba(255,255,255,.06);">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+<script>window.SB_SILENT = true;</script>
+<script src="supabase-sync.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Painel Administrativo - Rifa</title>
+<style>
+  :root {
+    --primary: #1d4ed8;
+    --primary-dark: #1e3a8a;
+    --primary-light: #3b82f6;
+    --muted: #94a3b8;
+    --border: #334155;
+    --text: #f1f5f9;
+    --bg: #0f172a;
+    --green: #4ade80;
+    --green-dark: #16a34a;
+    --red: #f87171;
+    --red-dark: #dc2626;
+    --gold: #fbbf24;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: #0f172a;
+    background-image:
+      radial-gradient(ellipse at 20% 50%, rgba(30,64,175,.5) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(59,130,246,.3) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 90%, rgba(29,78,216,.4) 0%, transparent 55%);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 16px 60px;
+  }
+
+  /* LOGIN */
+  #loginView { display: flex; justify-content: center; padding-top: 60px; }
+
+  .card {
+    background: linear-gradient(145deg, rgba(30,64,175,.8), rgba(37,99,235,.6));
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(96,165,250,.3);
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.4), 0 0 40px rgba(59,130,246,.15);
+    padding: 38px 32px;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    color: #fff;
+  }
+
+  .card h1 { font-size: 1.6rem; margin-bottom: 8px; color: #fff; font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,.3); }
+  .card p { color: rgba(255,255,255,.7); font-size: .92rem; margin-bottom: 20px; }
+
+  .card input {
+    width: 100%;
+    padding: 13px 14px;
+    border: 2px solid rgba(96,165,250,.3);
+    border-radius: 10px;
+    font-size: 1rem;
+    margin-bottom: 12px;
+    outline: none;
+    background: rgba(255,255,255,.08);
+    color: #fff;
+    transition: all .25s ease;
+  }
+
+  .card input::placeholder { color: rgba(255,255,255,.35); }
+
+  .card input:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 4px rgba(96,165,250,.2), 0 0 20px rgba(96,165,250,.15);
+    background: rgba(255,255,255,.12);
+  }
+
+  .card button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #1e293b;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(245,158,11,.4), 0 0 30px rgba(245,158,11,.2);
+    transition: all .25s ease;
+  }
+
+  .card button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(245,158,11,.5), 0 0 40px rgba(245,158,11,.3);
+  }
+
+  .err { color: #fca5a5; font-size: .85rem; min-height: 20px; margin-top: 8px; }
+
+  .card a {
+    display: inline-block;
+    margin-top: 16px;
+    color: #93c5fd;
+    text-decoration: none;
+    font-size: .88rem;
+    transition: color .25s ease;
+  }
+  .card a:hover { color: #fff; }
+
+  /* PAINEL */
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(96,165,250,.2);
+  }
+
+  .topbar h1 {
+    font-size: 1.5rem;
+    color: #fff;
+    font-weight: 800;
+    text-shadow: 0 2px 8px rgba(0,0,0,.3);
+  }
+
+  .top-right { display: flex; align-items: center; gap: 12px; }
+
+  .who { color: rgba(255,255,255,.7); font-size: .9rem; }
+
+  .topbar button {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 9px 20px;
+    font-size: .88rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(220,38,38,.3);
+    transition: all .25s ease;
+  }
+
+  .topbar button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220,38,38,.4);
+  }
+
+  .tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .tab {
+    padding: 10px 18px;
+    border: 2px solid rgba(96,165,250,.25);
+    border-radius: 999px;
+    background: rgba(255,255,255,.06);
+    color: rgba(255,255,255,.6);
+    font-size: .9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .25s ease;
+  }
+
+  .tab:hover { background: rgba(255,255,255,.12); color: #fff; }
+
+  .tab.active {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    border-color: #f59e0b;
+    color: #1e293b;
+    font-weight: 800;
+    box-shadow: 0 4px 16px rgba(245,158,11,.35);
+  }
+
+  .card-panel {
+    background: linear-gradient(145deg, rgba(30,64,175,.5), rgba(37,99,235,.3));
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(96,165,250,.2);
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.25);
+    padding: 24px;
+    margin-bottom: 16px;
+    color: #fff;
+  }
+
+  .ad-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+  }
+
+  .ad-stat {
+    text-align: center;
+    padding: 12px 8px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.08);
+    transition: all .25s ease;
+  }
+
+  .ad-stat:hover {
+    transform: translateY(-3px);
+    background: rgba(255,255,255,.1);
+    box-shadow: 0 4px 16px rgba(0,0,0,.15);
+  }
+
+  .ad-stat strong { display: block; font-size: 1.9rem; color: #fff; font-weight: 900; text-shadow: 0 2px 8px rgba(0,0,0,.3); }
+  .ad-stat span { font-size: .82rem; color: rgba(255,255,255,.6); }
+  .ad-stat.warn strong { color: #fbbf24; }
+  .ad-stat.ok strong { color: #4ade80; }
+  .ad-stat.free strong { color: #93c5fd; }
+
+  .subtitle { margin: 6px 0 10px; font-size: 1rem; color: #93c5fd; font-weight: 700; }
+
+  .table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  .table th, .table td { border: 1px solid rgba(96,165,250,.15); padding: 8px 10px; text-align: left; }
+  .table th { background: rgba(255,255,255,.06); color: rgba(255,255,255,.7); font-weight: 600; }
+  .table td { color: rgba(255,255,255,.85); }
+  .empty { color: rgba(255,255,255,.4); text-align: center; }
+
+  .btn {
+    border: 1px solid rgba(96,165,250,.3);
+    background: rgba(255,255,255,.08);
+    color: #93c5fd;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: .82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .25s ease;
+  }
+  .btn:hover { background: rgba(255,255,255,.15); color: #fff; }
+
+  .btn.ok {
+    background: linear-gradient(135deg, rgba(74,222,128,.2), rgba(22,163,74,.2));
+    border-color: rgba(74,222,128,.4);
+    color: #4ade80;
+  }
+  .btn.ok:hover { background: rgba(74,222,128,.3); box-shadow: 0 0 14px rgba(74,222,128,.2); }
+
+  .btn.danger {
+    background: linear-gradient(135deg, rgba(248,113,113,.2), rgba(220,38,38,.2));
+    border-color: rgba(248,113,113,.4);
+    color: #f87171;
+  }
+  .btn.danger:hover { background: rgba(248,113,113,.3); box-shadow: 0 0 14px rgba(248,113,113,.2); }
+
+  .sold-form {
+    margin-top: 14px;
+    background: rgba(251,191,36,.08);
+    border: 1px solid rgba(251,191,36,.25);
+    border-radius: 12px;
+    padding: 14px;
+  }
+  .sold-form label { font-size: .85rem; color: #fbbf24; display: block; margin-bottom: 6px; font-weight: 600; }
+  .sold-row { display: flex; gap: 8px; }
+  .sold-row input {
+    flex: 1; min-width: 0; padding: 9px 10px;
+    border: 2px solid rgba(96,165,250,.25);
+    border-radius: 8px; font-size: .95rem;
+    background: rgba(255,255,255,.06);
+    color: #fff;
+    outline: none;
+    transition: all .25s ease;
+  }
+  .sold-row input::placeholder { color: rgba(255,255,255,.3); }
+  .sold-row input:focus { border-color: #93c5fd; box-shadow: 0 0 0 3px rgba(96,165,250,.15); }
+
+  .link-back {
+    display: inline-block;
+    margin-top: 20px;
+    color: #93c5fd;
+    text-decoration: none;
+    font-size: .92rem;
+    font-weight: 600;
+    transition: color .25s ease;
+  }
+  .link-back:hover { color: #fff; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+
+    <div id="loginView">
+      <div class="card">
+        <h1>Painel Administrativo</h1>
+        <p>Digite o celular (ou nome da conta) e a senha de administrador.</p>
+        <input type="tel" id="adminCell" autocomplete="tel" placeholder="Celular ou nome da conta" />
+        <input type="password" id="adminPass" autocomplete="current-password" placeholder="Senha" />
+        <button id="btnLogin" type="button">Entrar</button>
+        <p class="err" id="loginErr"></p>
+        <a href="index.html">Voltar para a página da rifa</a>
+      </div>
+    </div>
+
+    <div id="panelView" style="display:none;">
+      <header class="topbar">
+        <h1>Painel Administrativo</h1>
+        <div class="top-right">
+          <span class="who" id="adminWho"></span>
+          <button id="btnSair" type="button">Sair</button>
+        </div>
+      </header>
+
+      <div class="tabs">
+        <button type="button" class="tab active" data-t="stats">Visão geral</button>
+        <button type="button" class="tab" data-t="usuarios">Usuários</button>
+        <button type="button" class="tab" data-t="pendentes">Pedidos pendentes</button>
+        <button type="button" class="tab" data-t="vendidas">Vendas confirmadas</button>
+        <button type="button" class="tab" data-t="registros">Registros</button>
+        <button type="button" class="tab" data-t="admins">Admins</button>
+      </div>
+
+      <div id="tab-stats" class="view"></div>
+      <div id="tab-usuarios" class="view" hidden></div>
+      <div id="tab-pendentes" class="view" hidden></div>
+      <div id="tab-vendidas" class="view" hidden></div>
+      <div id="tab-registros" class="view" hidden></div>
+      <div id="tab-admins" class="view" hidden></div>
+    </div>
+
+  </div>
+
+  <!-- Modal de confirmação: desfazer venda -->
+  <div id="confirmModal" style="display:none;position:fixed;inset:0;background:rgba(3,7,18,.72);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:linear-gradient(160deg,#1e293b,#0f172a);border:1px solid rgba(248,113,113,.5);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 40px rgba(248,113,113,.15);max-width:440px;width:92%;padding:28px 24px;text-align:center;">
+      <p id="confirmTxt" style="font-size:1.9rem;margin:0 0 12px;">⚠️</p>
+      <p style="font-weight:800;font-size:1.05rem;color:var(--text);margin:0 0 10px;">Atenção: esta ação é irreversível.</p>
+      <p style="font-size:.9rem;color:var(--muted);line-height:1.5;margin:0 0 18px;">Após a confirmação, os dados serão removidos permanentemente e não poderão ser recuperados.</p>
+      <p style="font-size:.86rem;color:var(--gold);font-weight:700;margin:0 0 18px;" id="confirmMeta"></p>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn danger" id="confirmYes" disabled>Confirmar ação (10s)</button>
+        <button class="btn" id="confirmNo">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+<!-- Modal de confirmação de remoção de USUÁRIO (10s + senha do usuário) -->
+  <div id="rmUserModal" style="display:none;position:fixed;inset:0;background:rgba(3,7,18,.78);backdrop-filter:blur(5px);z-index:99999;align-items:center;justify-content:center;">
+    <div style="background:linear-gradient(160deg,#1e293b,#0f172a);border:2px solid rgba(248,113,113,.6);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 50px rgba(248,113,113,.2);max-width:460px;width:92%;padding:30px 24px;text-align:center;box-sizing:border-box;">
+      <p style="font-size:2rem;margin:0 0 8px;">⚠️</p>
+      <p style="font-weight:800;font-size:1.1rem;color:#fff;margin:0 0 8px;">Remover usuário</p>
+      <p id="rmUserMeta" style="font-size:1rem;color:var(--gold);font-weight:700;margin:0 0 10px;"></p>
+      <p style="font-size:.9rem;color:var(--muted);line-height:1.5;margin:0 0 10px;">Esta ação é irreversível: a conta e seus dados serão apagados. Aguarde a contagem regressiva e depois confirme.</p>
+      <p style="font-size:.88rem;color:#fbbf24;font-weight:600;margin:0 0 8px;">Espera de 10 segundos para confirmar:</p>
+      <button id="rmUserYes0_dummy" disabled style="display:none;"></button>
+      <input id="rmUserPass" type="password" placeholder="Digite a senha do USUÁRIO para confirmar" disabled style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid rgba(148,163,184,.3);background:rgba(15,23,42,.7);color:#fff;font:600 .95rem 'Segoe UI',sans-serif;text-align:center;margin:0 0 10px;outline:none;box-sizing:border-box;" />
+      <p id="rmUserErr" style="font-size:.85rem;color:#f87171;margin:0 0 12px;min-height:1.2em;font-weight:600;"></p>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button id="rmUserYes" disabled style="padding:11px 20px;border:none;border-radius:11px;cursor:pointer;font:700 .92rem 'Segoe UI',sans-serif;color:#fff;background:linear-gradient(135deg,#ef4444,#dc2626);opacity:.5;transition:opacity .2s,transform .2s;">Aguardando 10s…</button>
+        <button id="rmUserNo" style="padding:11px 20px;border:1px solid rgba(148,163,184,.35);border-radius:11px;cursor:pointer;font:700 .92rem 'Segoe UI',sans-serif;color:#e2e8f0;background:rgba(255,255,255,.06);">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+<script src="supabase-sync.js"></script>
+<script>
+  // ============================================================
+  //  CONFIGURACOES - EDITE AQUI
+  // ============================================================
+  var CONFIG = {
+    TOTAL: 500,                    // Total de fichas
+    PRICE: 3,                      // Valor da ficha em reais
+    PRIZE: "Cesta Cheia de Guloseimas",
+    ADMIN_PASSWORD: "sistema2009"     // Senha padrão usada apenas no 1º acesso; depois gere pela aba Admins
+  };
+  // ============================================================
+
+  var USERS_KEY = "rifa_usuarios";
+  var SESSION_KEY = "rifa_sessao";
+  var RESERVAS_KEY = "rifa_reservas";
+  var SOLDS_KEY = "rifa_vendidas";
+  var WINNER_KEY = "rifa_vencedora";
+  var LOG_KEY = "rifa_log";
+  var ADMINS_KEY = "rifa_admins";
+  var ADMIN_SESSION_KEY = "rifa_admin_sessao";
+  var ADMIN_SESSION_USER = "rifa_admin_user";
+  var ADMIN_SESSION_HASH = "rifa_admin_hash";
+  var ADMIN_SESSION_CELL = "rifa_admin_cell";
+
+  function loadJSON(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+
+  function saveJSON(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+    if (key === "rifa_reservas") {
+      if (typeof sbReservaUpsert === "function") {
+        var _rows = [];
+        for (var _f in value) {
+          var _r = value[_f] || {};
+          _rows.push({ ficha: Number(_f), nome_cliente: String(_r.nome || "").slice(0, 150), celular_cli: String(_r.celular || ""), status: "pendente", data_reserva: _r.data || null });
+        }
+        sbReservaUpsert(_rows);
+      } else if (!window.__sbWarned) { window.__sbWarned = true; console.error("supabase-sync.js nao carregou — dados ficam so no localStorage."); }
+      return;
+    }
+    if (typeof sbSyncKey === "function") { sbSyncKey(key, value); }
+    else if (!window.__sbWarned) { window.__sbWarned = true; console.error("supabase-sync.js nao carregou — dados ficam so no localStorage."); }
+  }
+
+  function esc(txt) {
+    return String(txt).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function pad(n) { return String(n).padStart(3, "0"); }
+
+  // Hash simples para nao guardar a senha em texto puro (mesmo esquema do script.js)
+  function hashPass(P) {
+    var h = 5381;
+    for (var i = 0; i < P.length; i++) h = ((h << 5) + h + P.charCodeAt(i)) | 0;
+    return "h" + Math.abs(h).toString(36) + "_" + P.length;
+  }
+
+  function loadAdmins() {
+    var admins = loadJSON(ADMINS_KEY, null);
+    if (!admins || !admins.length) {
+      admins = [
+        { nome: "Admin", celular: "", hash: hashPass(CONFIG.ADMIN_PASSWORD), criadoEm: new Date().toISOString() },
+        { nome: "Luis Dias", celular: "38999366977", hash: hashPass("sistema2009"), principal: true, criadoEm: new Date().toISOString() }
+      ];
+      saveJSON(ADMINS_KEY, admins);
+    } else {
+      // Garante que a conta do admin principal (Luis Dias / 38999366977)
+      // seja sempre tratada como principal, mesmo em listas ja existentes.
+      var principalCell = "38999366977";
+      var changed = false;
+      for (var i = 0; i < admins.length; i++) {
+        admins[i].principal = !!admins[i].principal;
+        if (admins[i].celular === principalCell) {
+          admins[i].principal = true;
+          admins[i].nome = "Luis Dias";
+          changed = true;
+        }
+      }
+      if (changed) saveJSON(ADMINS_KEY, admins);
+    }
+    return admins;
+  }
+
+  function currentAdminName() {
+    var nome = sessionStorage.getItem(ADMIN_SESSION_USER);
+    if (nome) return nome;
+    var hash = sessionStorage.getItem(ADMIN_SESSION_HASH);
+    if (hash) {
+      var admins = loadAdmins();
+      for (var i = 0; i < admins.length; i++) {
+        if (admins[i].hash === hash) return admins[i].nome;
+      }
+    }
+    return "admin";
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return "-";
+    var d = new Date(iso);
+    return d.toLocaleDateString("pt-BR") + " " + d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function tableHTML(title, headers, rows, emptyMsg) {
+    var h = "<div class='card-panel'><h3 class='subtitle'>" + title + "</h3><table class='table'>";
+    h += "<thead><tr>" + headers.map(function (x) { return "<th>" + x + "</th>"; }).join("") + "</tr></thead><tbody>";
+    h += rows || ("<tr><td colspan='" + headers.length + "' class='empty'>" + emptyMsg + "</td></tr>");
+    h += "</tbody></table></div>";
+    return h;
+  }
+
+  // Baixa os dados mais recentes do banco antes de qualquer leitura
+  if (typeof sbHydrate === "function") { sbHydrate(); }
+
+  // ============================================================
+  //  AUTENTICACAO
+  // ============================================================
+  var isAdmin = sessionStorage.getItem(ADMIN_SESSION_KEY) === "1";
+
+  function showPanel() {
+    if (!sessionStorage.getItem(ADMIN_SESSION_USER)) {
+      var admins = loadAdmins();
+      if (admins.length === 1) {
+        sessionStorage.setItem(ADMIN_SESSION_USER, admins[0].nome);
+        sessionStorage.setItem(ADMIN_SESSION_HASH, admins[0].hash);
+        sessionStorage.setItem(ADMIN_SESSION_CELL, admins[0].celular || "");
+      }
+    }
+    document.getElementById("loginView").style.display = "none";
+    document.getElementById("panelView").style.display = "";
+    document.getElementById("adminWho").textContent = "Olá, " + currentAdminName() + "!";
+    renderAdminPanel();
+  }
+
+  if (isAdmin) {
+    showPanel();
+  }
+
+  document.getElementById("btnLogin").addEventListener("click", function () {
+    var cell = document.getElementById("adminCell").value.replace(/\D/g, "");
+    var pass = document.getElementById("adminPass").value;
+    var admins = loadAdmins();
+    var h = hashPass(pass);
+    var match = null;
+    for (var i = 0; i < admins.length; i++) {
+      var celMatch = admins[i].celular && admins[i].celular === cell;
+      var nomeMatch = admins[i].nome && admins[i].nome.toLowerCase() === document.getElementById("adminCell").value.trim().toLowerCase();
+      if ((celMatch || nomeMatch) && admins[i].hash === h) { match = admins[i]; break; }
+    }
+    if (match) {
+      document.getElementById("loginErr").textContent = "";
+      isAdmin = true;
+      sessionStorage.setItem(ADMIN_SESSION_KEY, "1");
+      sessionStorage.setItem(ADMIN_SESSION_USER, match.nome);
+      sessionStorage.setItem(ADMIN_SESSION_HASH, match.hash);
+      sessionStorage.setItem(ADMIN_SESSION_CELL, match.celular || cell);
+      if (typeof sbRegLog === "function") { sbRegLog("admin", cell); }
+      showPanel();
+    } else {
+      document.getElementById("loginErr").textContent = "Celular ou senha incorretos.";
+    }
+  });
+
+  [document.getElementById("adminCell"), document.getElementById("adminPass")].forEach(function (el) {
+    el.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") document.getElementById("btnLogin").click();
+    });
+  });
+
+  document.getElementById("btnSair").addEventListener("click", function () {
+    isAdmin = false;
+    sessionStorage.removeItem(ADMIN_SESSION_KEY);
+    sessionStorage.removeItem(ADMIN_SESSION_USER);
+    sessionStorage.removeItem(ADMIN_SESSION_HASH);
+    sessionStorage.removeItem(ADMIN_SESSION_CELL);
+    document.getElementById("loginView").style.display = "flex";
+    document.getElementById("panelView").style.display = "none";
+    document.getElementById("adminPass").value = "";
+    document.getElementById("adminCell").value = "";
+    document.getElementById("loginErr").textContent = "";
+  });
+
+  // ============================================================
+  //  ABAS
+  // ============================================================
+  var currentTab = "stats";
+
+  function switchTab(t) {
+    currentTab = t;
+    ["stats", "usuarios", "pendentes", "vendidas", "registros", "admins"].forEach(function (id) {
+      document.getElementById("tab-" + id).hidden = id !== t;
+    });
+    document.querySelectorAll(".tab").forEach(function (b) {
+      b.classList.toggle("active", b.dataset.t === t);
+    });
+  }
+
+  document.querySelectorAll(".tab").forEach(function (b) {
+    b.addEventListener("click", function () { switchTab(b.dataset.t); });
+  });
+
+  // ============================================================
+  //  RENDER (sempre le dados frescos do localStorage)
+  // ============================================================
+  function renderAdminPanel() {
+    var users = loadJSON(USERS_KEY, {});
+    var reservas = loadJSON(RESERVAS_KEY, {});
+    var financeiro = loadJSON(SOLDS_KEY, {});
+    var adminsPrincipal = loadAdmins();
+    var currentHash = sessionStorage.getItem(ADMIN_SESSION_HASH) || "";
+    var currentCell = (sessionStorage.getItem(ADMIN_SESSION_CELL) || "").replace(/\D/g, "");
+    var isPrincipal = false;
+    for (var prix = 0; prix < adminsPrincipal.length; prix++) {
+      if (adminsPrincipal[prix].principal && (adminsPrincipal[prix].celular || "").replace(/\D/g, "") === currentCell) { isPrincipal = true; break; }
+    }
+    var reservedN = Object.keys(reservas).map(Number).sort(function (a, b) { return a - b; });
+    var soldN = Object.keys(financeiro).map(Number).sort(function (a, b) { return a - b; });
+    var soldCount = soldN.length;
+    var rest = CONFIG.TOTAL - reservedN.length - soldCount;
+    var winner = loadJSON(WINNER_KEY, null);
+    var winnerLabel = winner && winner.numero ? "#" + winner.numero : "-";
+
+    // Visão geral
+    document.getElementById("tab-stats").innerHTML =
+      '<div class="card-panel"><div class="ad-stats">' +
+        '<div class="ad-stat"><strong>' + CONFIG.TOTAL + "</strong><span>Fichas totais</span></div>" +
+        '<div class="ad-stat warn"><strong>' + reservedN.length + "</strong><span>Reservadas</span></div>" +
+        '<div class="ad-stat ok"><strong>' + soldCount + "</strong><span>Vendidas</span></div>" +
+        '<div class="ad-stat free"><strong>' + Math.max(rest, 0) + "</strong><span>Disponíveis</span></div>" +
+        '<div class="ad-stat"><strong>' + Object.keys(users).length + "</strong><span>Usuários</span></div>" +
+        '<div class="ad-stat"><strong>' + winnerLabel + "</strong><span>Vencedora</span></div>" +
+      "</div></div>" +
+      '<div class="card-panel"><h3 class="subtitle">Ficha vencedora</h3>' +
+        (winner && winner.numero
+          ? '<p style="margin-bottom:10px;">Vencedora atual: <strong>#' + winner.numero + '</strong> <span style="color:var(--muted);font-size:.85rem;">(definida em ' + fmtDate(winner.definidoEm) + (winner.definidoPor ? " por " + esc(winner.definidoPor) : "") + ")</span></p>"
+          : "") +
+        '<div class="sold-form" id="winnerForm"><label>Definir ficha vencedora (digite o número):</label>' +
+        '<div class="sold-row"><input type="number" id="winnerNum" min="1" max="' + CONFIG.TOTAL + '" placeholder="Ex.: 42" />' +
+        '<button class="btn ok" id="winnerBtn">Definir vencedora</button>' +
+        (winner ? '<button class="btn danger" id="winnerClearBtn">Remover</button>' : "") +
+        "</div></div></div>" +
+      "<p class='link-back'><a href='index.html'>Voltar para a página da rifa</a></p>";
+
+    // Usuários
+    var rowsU = Object.keys(users).map(function (c) {
+      var u = users[c];
+      var canRm = isPrincipal;
+      return "<tr><td>" + esc(u.nome) + "</td><td>" + u.idade + "</td><td>" + c + "</td><td>" + fmtDate(u.criadoEm) + "</td>" +
+        "<td>" + (canRm ? '<button class="btn danger" data-act="rmuser" data-cel="' + c + '">Remover</button>' : "-") + "</td></tr>";
+    }).join("");
+    document.getElementById("tab-usuarios").innerHTML =
+      tableHTML("Usuários cadastrados (" + Object.keys(users).length + ")", ["Nome completo", "Idade", "Celular", "Cadastrado em", "Ações"], rowsU, "Nenhum usuário cadastrado ainda.");
+
+    // Pedidos pendentes
+    var winnerLocked = winner && winner.numero;
+    var rowsP = reservedN.map(function (n) {
+      var r = reservas[n];
+      return "<tr><td><strong>#" + pad(n) + "</strong></td><td>" + esc(r.nome) + "</td><td>" + r.celular + "</td><td>" + fmtDate(r.data) + "</td>" +
+        '<td>' + (winnerLocked ? "-" : '<button class="btn ok" data-act="vender" data-n="' + n + '">Confirmar venda</button> <button class="btn" data-act="liberar" data-n="' + n + '">Liberar</button>') + '</td></tr>';
+    }).join("");
+    var pendLockBanner = winnerLocked
+      ? '<div class="card-panel" style="border:2px solid rgba(74,222,128,.4);background:rgba(74,222,128,.08);"><h3 class="subtitle" style="color:#4ade80;">Sorteio realizado</h3><p style="color:rgba(255,255,255,.7);font-size:.9rem;">A ficha vencedora <strong>#' + pad(Number(winner.numero)) + '</strong> já foi sorteada. As vendas e reservas estão bloqueadas. Remova a vencedora na aba "Visão geral" para reabrir.</p></div>'
+      : "";
+    document.getElementById("tab-pendentes").innerHTML =
+      pendLockBanner +
+      tableHTML("Pedidos pendentes (" + reservedN.length + ")", ["Ficha", "Comprador", "Celular", "Reservada em", "Ações"], rowsP, "Nenhum pedido pendente.") +
+      (winnerLocked
+        ? '<div class="sold-form" style="opacity:.5;pointer-events:none;"><label>Vendas bloqueadas após o sorteio</label></div>'
+        : '<div class="sold-form"><label>Marcar ficha como vendida (digite o número):</label>' +
+          '<div class="sold-row"><input type="number" id="soldNum" min="1" max="' + CONFIG.TOTAL + '" placeholder="Ex.: 42" />' +
+          '<button class="btn ok" id="soldBtn">Vender</button></div></div>');
+
+    // Vendas confirmadas
+    var rowsV = soldN.map(function (n) {
+      var r = financeiro[n];
+      var nome = r && r.nome ? r.nome : "venda direta";
+      var aprov = r && r.aprovadoPor ? r.aprovadoPor : "-";
+      var isWinner = winnerLocked && Number(winner.numero) === n;
+      return "<tr>" + (isWinner ? "<td><strong>#" + pad(n) + "</strong> ⭐</td>" : "<td><strong>#" + pad(n) + "</strong></td>") + "<td>" + esc(nome) + "</td><td>" + esc(aprov) + "</td><td>" + fmtDate(r && r.data) + "</td>" +
+        "<td>" + (isWinner ? '<span style="color:#4ade80;font-weight:700;">Vencedora</span>' : (winnerLocked ? "-" : '<button class="btn danger" data-act="desfazer" data-n="' + n + '">Desfazer venda</button>')) + "</td></tr>";
+    }).join("");
+    document.getElementById("tab-vendidas").innerHTML =
+      (winnerLocked ? pendLockBanner : "") +
+      tableHTML("Vendas confirmadas (" + soldN.length + ")", ["Número", "Comprador", "Aprovado por", "Data", "Ações"], rowsV, "Nenhuma venda confirmada ainda.");
+
+    // Registros de datas (a cada 2 dias)
+    var registros = loadJSON(LOG_KEY, []);
+    var rowsReg = registros.slice().reverse().map(function (r) {
+      return "<tr><td>" + fmtDate(r.data) + "</td></tr>";
+    }).join("");
+    document.getElementById("tab-registros").innerHTML =
+      tableHTML("Datas registradas (" + registros.length + ")", ["Data registrada"], rowsReg, "Nenhum registro ainda. Abra o site e aguarde o próximo registro de 2 em 2 dias.");
+
+    // Admins
+    var admins = loadAdmins();
+    var rowsA = admins.map(function (a, i) {
+      var isMe = (a.celular || "").replace(/\D/g, "") === currentCell;
+      var canRemove = admins.length > 1 && !isMe && isPrincipal && !a.principal;
+      return "<tr><td>" + esc(a.nome) + (a.principal ? ' <span style="color:var(--gold);font-size:.8rem;">★ principal</span>' : "") + (isMe ? ' <span style="color:var(--muted);font-size:.8rem;">(você)</span>' : "") +
+        "</td><td>" + esc(a.celular || "-") + "</td><td>••••••</td><td>" + fmtDate(a.criadoEm) + "</td><td>" +
+        (canRemove ? '<button class="btn danger" data-act="rmadmin" data-idx="' + i + '">Remover</button>' : "-") + "</td></tr>";
+    }).join("");
+    document.getElementById("tab-admins").innerHTML =
+      tableHTML("Administradores (" + admins.length + ")", ["Nome", "Celular", "Senha", "Adicionado em", "Ações"], rowsA, "") +
+      (isPrincipal
+        ? '<div class="card-panel"><h3 class="subtitle">Adicionar administrador</h3>' +
+          '<div class="sold-form"><label>Número do celular (usado para login)</label>' +
+          '<div class="sold-row"><input type="tel" id="newAdminCelular" placeholder="(11) 91234-5678" /></div>' +
+          '<label>Nome do administrador</label>' +
+          '<div class="sold-row"><input type="text" id="newAdminNome" placeholder="Ex.: Luis Otavio" /></div>' +
+          '<label>Senha de acesso</label>' +
+          '<div class="sold-row"><input type="password" id="newAdminSenha" placeholder="Defina uma senha (mín. 4 caracteres)" /></div>' +
+          '<p class="err" id="admErr"></p>' +
+          '<button class="btn ok" id="addAdminBtn">Adicionar admin</button></div>' +
+          '<p style="font-size:.82rem;color:var(--muted);">As senhas são guardadas em hash (não em texto puro). Você não pode remover a si mesmo.</p>'
+        : '<div class="card-panel"><p style="color:var(--gold);font-size:.9rem;">Somente o administrador principal ★ pode adicionar ou remover administradores.</p></div>');
+  }
+
+  // ============================================================
+  //  AÇÕES
+  // ============================================================
+  var pendingWinner = null;
+  var winnerTimer = null;
+
+  function refreshAll() {
+    if (winnerTimer) { clearInterval(winnerTimer); winnerTimer = null; }
+    pendingWinner = null;
+    renderAdminPanel();
+  }
+
+  document.getElementById("tab-stats").addEventListener("click", function (e) {
+    var btn = e.target.closest(".btn");
+    if (!btn) return;
+
+    if (btn.id === "winnerBtn") {
+      var n = Number(document.getElementById("winnerNum").value);
+      if (!n || n < 1 || n > CONFIG.TOTAL) return;
+      pendingWinner = n;
+      var form = document.getElementById("winnerForm");
+      form.innerHTML =
+        '<p style="color:#b91c1c;font-weight:700;margin:0 0 8px;">Ação irreversível!</p>' +
+        '<p style="font-size:.88rem;color:#92400e;margin-bottom:10px;">Você está definindo a ficha <strong>#' + n + '</strong> como vencedora. A confirmação fica bloqueada por 10 segundos para que você possa conferir antes de confirmar.</p>' +
+        '<div class="sold-row"><button class="btn ok" id="confirmWinner" disabled>Confirmar vencedora (10s)</button>' +
+        '<button class="btn danger" id="cancelWinner">Cancelar</button></div>';
+      var btnC = document.getElementById("confirmWinner");
+      var left = 10;
+      winnerTimer = setInterval(function () {
+        left--;
+        if (left <= 0) {
+          clearInterval(winnerTimer);
+          winnerTimer = null;
+          btnC.disabled = false;
+          btnC.textContent = "Confirmar vencedora agora";
+        } else {
+          btnC.textContent = "Confirmar vencedora (" + left + "s)";
+        }
+      }, 1000);
+    }
+
+    if (btn.id === "confirmWinner") {
+      if (pendingWinner) {
+        saveJSON(WINNER_KEY, {
+          numero: pendingWinner,
+          definidoEm: new Date().toISOString(),
+          definidoPor: currentAdminName()
+        });
+      }
+      refreshAll();
+    }
+
+    if (btn.id === "winnerClearBtn") {
+      localStorage.removeItem(WINNER_KEY);
+      refreshAll();
+    }
+
+    if (btn.id === "cancelWinner") {
+      refreshAll();
+    }
+  });
+
+  document.getElementById("tab-pendentes").addEventListener("click", function (e) {
+    var btn = e.target.closest(".btn");
+    if (!btn) return;
+    var winner = loadJSON(WINNER_KEY, null);
+    if (winner && winner.numero) {
+      alert("Sorteio já realizado! Remova a ficha vencedora para voltar a gerenciar vendas.");
+      return;
+    }
+    var n = Number(btn.dataset.n);
+    var reservas = loadJSON(RESERVAS_KEY, {});
+    var financeiro = loadJSON(SOLDS_KEY, {});
+    if (btn.id === "soldBtn") {
+      n = Number(document.getElementById("soldNum").value);
+      if (!n || n < 1 || n > CONFIG.TOTAL) return;
+      financeiro[n] = financeiro[n] || { nome: "venda direta", celular: "-", data: new Date().toISOString() };
+      financeiro[n].aprovadoPor = currentAdminName();
+      saveJSON(SOLDS_KEY, financeiro);
+      delete reservas[n];
+      saveJSON(RESERVAS_KEY, reservas);
+      if (typeof sbAprovarVenda === "function") { sbAprovarVenda(n, financeiro[n].nome, financeiro[n].celular || "-", financeiro[n].data, new Date().toISOString()); }
+      document.getElementById("soldNum").value = "";
+      refreshAll();
+      return;
+    }
+    if (btn.dataset.act === "vender") {
+      if (!reservas[n]) return;
+      var origem = reservas[n];
+      financeiro[n] = origem;
+      financeiro[n].aprovadoPor = currentAdminName();
+      saveJSON(SOLDS_KEY, financeiro);
+      delete reservas[n];
+      saveJSON(RESERVAS_KEY, reservas);
+      if (typeof sbAprovarVenda === "function") { sbAprovarVenda(n, origem.nome, origem.celular || "-", origem.data, new Date().toISOString()); }
+      refreshAll();
+    }
+    if (btn.dataset.act === "liberar") {
+      if (!reservas[n]) return;
+      delete reservas[n];
+      saveJSON(RESERVAS_KEY, reservas);
+      refreshAll();
+    }
+  });
+
+  document.getElementById("tab-vendidas").addEventListener("click", function (e) {
+    var btn = e.target.closest(".btn");
+    if (!btn || btn.dataset.act !== "desfazer") return;
+    var n = Number(btn.dataset.n);
+    var winner = loadJSON(WINNER_KEY, null);
+    if (winner && winner.numero && winner.numero == n) {
+      alert("Esta é a ficha vencedora. Remova a vencedora na aba 'Visão geral' antes de desfazer.");
+      return;
+    }
+    var financeiro = loadJSON(SOLDS_KEY, {});
+    var info = financeiro[n] || {};
+    openUndoConfirm(n, info);
+  });
+
+  var undoPending = null;
+  var undoTimer = null;
+
+  function openUndoConfirm(n, info) {
+    var modal = document.getElementById("confirmModal");
+    var yesBtn = document.getElementById("confirmYes");
+    var meta = document.getElementById("confirmMeta");
+    modal.style.display = "flex";
+    meta.textContent = "Ficha #" + pad(n) + " • Deseja continuar?";
+    undoPending = n;
+    yesBtn.disabled = true;
+    var left = 10;
+    yesBtn.textContent = "Confirmar ação (10s)";
+    if (undoTimer) { clearInterval(undoTimer); }
+    undoTimer = setInterval(function () {
+      left--;
+      if (left <= 0) {
+        clearInterval(undoTimer);
+        undoTimer = null;
+        yesBtn.disabled = false;
+        yesBtn.textContent = "Confirmar ação agora";
+      } else {
+        yesBtn.textContent = "Confirmar ação (" + left + "s)";
+      }
+    }, 1000);
+  }
+
+  document.getElementById("confirmYes").addEventListener("click", function () {
+    if (undoPending == null) return;
+    var n = Number(undoPending);
+    undoPending = null;
+    if (undoTimer) { clearInterval(undoTimer); undoTimer = null; }
+    var financeiro = loadJSON(SOLDS_KEY, {});
+    delete financeiro[n];
+    saveJSON(SOLDS_KEY, financeiro);
+    document.getElementById("confirmModal").style.display = "none";
+    refreshAll();
+  });
+
+  document.getElementById("confirmNo").addEventListener("click", function () {
+    undoPending = null;
+    if (undoTimer) { clearInterval(undoTimer); undoTimer = null; }
+    document.getElementById("confirmModal").style.display = "none";
+  });
+
+  // ============ REMOVER USUÁRIO (principal, 10s + senha do usuário) ============
+  var rmUModal = document.getElementById("rmUserModal");
+  var rmUYes = document.getElementById("rmUserYes");
+  var rmUNo = document.getElementById("rmUserNo");
+  var rmUPass = document.getElementById("rmUserPass");
+  var rmUMeta = document.getElementById("rmUserMeta");
+  var rmUErr = document.getElementById("rmUserErr");
+  var rmUTimer = null;
+  var rmCel = null;
+
+  document.getElementById("tab-usuarios").addEventListener("click", function (e) {
+    var btn = e.target.closest(".btn");
+    if (!btn || btn.dataset.act !== "rmuser") return;
+    var admins2 = loadAdmins();
+    var cell2 = (sessionStorage.getItem(ADMIN_SESSION_CELL) || "").replace(/\D/g, "");
+    var isP = false;
+    for (var q = 0; q < admins2.length; q++) {
+      if (admins2[q].principal && (admins2[q].celular || "").replace(/\D/g, "") === cell2) { isP = true; break; }
+    }
+    if (!isP) return;
+    var users2 = loadJSON(USERS_KEY, {});
+    var uc = btn.dataset.cel;
+    var userObj = users2[uc];
+    if (!userObj) return;
+    rmCel = uc;
+    rmUMeta.textContent = userObj.nome + " • " + uc;
+    rmUErr.textContent = "";
+    rmUPass.value = "";
+    rmUPass.disabled = true;
+    var left2 = 10;
+    rmUYes.disabled = true;
+    rmUYes.style.opacity = ".5";
+    rmUYes.textContent = "Aguardando 10s…";
+    if (rmUTimer) { clearInterval(rmUTimer); rmUTimer = null; }
+    rmUTimer = setInterval(function () {
+      left2--;
+      if (left2 <= 0) {
+        clearInterval(rmUTimer);
+        rmUTimer = null;
+        rmUPass.disabled = false;
+        rmUYes.disabled = false;
+        rmUYes.style.opacity = "1";
+        rmUYes.textContent = "Confirmar remoção";
+        rmUPass.focus();
+      } else {
+        rmUYes.textContent = "Aguardando " + left2 + "s…";
+      }
+    }, 1000);
+    rmUModal.style.display = "flex";
+  });
+
+  if (rmUNo) {
+    rmUNo.addEventListener("click", function () {
+      if (rmUTimer) { clearInterval(rmUTimer); rmUTimer = null; }
+      rmUModal.style.display = "none";
+      rmCel = null;
+    });
+  }
+  if (rmUModal) {
+    rmUModal.addEventListener("click", function (e) {
+      if (e.target === rmUModal && rmUNo) rmUNo.click();
+    });
+  }
+  if (rmUYes) {
+    rmUYes.addEventListener("click", function () {
+      if (rmCel == null || rmUPass.disabled) return;
+      var users3 = loadJSON(USERS_KEY, {});
+      var u3 = users3[rmCel];
+      if (!u3) { rmUErr.textContent = "Usuário não encontrado."; return; }
+      var cp = (rmCel || "").replace(/\D/g, "");
+      if (hashPass(rmUPass.value) !== u3.senha) { rmUErr.textContent = "Senha do usuário incorreta. Tente novamente."; return; }
+      delete users3[rmCel];
+      saveJSON(USERS_KEY, users3);
+      var resCap = loadJSON(RESERVAS_KEY, {});
+      Object.keys(resCap).forEach(function (k) {
+        var r = resCap[k] || {};
+        if ((r.celular || "").replace(/\D/g, "") === cp) delete resCap[k];
+      });
+      saveJSON(RESERVAS_KEY, resCap);
+      if (rmUTimer) { clearInterval(rmUTimer); rmUTimer = null; }
+      rmUModal.style.display = "none";
+      rmCel = null;
+      renderAdminPanel();
+      if (typeof sbToast === "function") { sbToast("Usuário removido", "ok"); }
+    });
+  }
+
+  document.getElementById("tab-admins").addEventListener("click", function (e) {
+    var btn = e.target.closest(".btn");
+    if (!btn) return;
+    var admins = loadAdmins();
+    var currentHash = sessionStorage.getItem(ADMIN_SESSION_HASH) || "";
+    var currentCell = (sessionStorage.getItem(ADMIN_SESSION_CELL) || "").replace(/\D/g, "");
+    var isPrincipal = false;
+    for (var p = 0; p < admins.length; p++) {
+      if (admins[p].principal && (admins[p].celular || "").replace(/\D/g, "") === currentCell) { isPrincipal = true; break; }
+    }
+    if (btn.id === "addAdminBtn") {
+      if (!isPrincipal) { document.getElementById("admErr").textContent = "Apenas o administrador principal pode adicionar admins."; return; }
+      var nome = document.getElementById("newAdminNome").value.trim();
+      var senha = document.getElementById("newAdminSenha").value;
+      var cell = document.getElementById("newAdminCelular").value.replace(/\D/g, "");
+      var err = document.getElementById("admErr");
+      if (cell.length < 10) { err.textContent = "Informe um celular válido com DDD."; return; }
+      if (nome.length < 3) { err.textContent = "Informe o nome do administrador (mín. 3 letras)."; return; }
+      if (senha.length < 4) { err.textContent = "A senha deve ter ao menos 4 caracteres."; return; }
+      for (var i = 0; i < admins.length; i++) {
+        if (admins[i].celular === cell) { err.textContent = "Este celular já está cadastrado como admin."; return; }
+      }
+      admins.push({ nome: nome, celular: cell, hash: hashPass(senha), criadoEm: new Date().toISOString() });
+      saveJSON(ADMINS_KEY, admins);
+      renderAdminPanel();
+      return;
+    }
+    if (btn.dataset.act === "rmadmin") {
+      if (!isPrincipal) { document.getElementById("admErr").textContent = "Apenas o administrador principal pode remover admins."; return; }
+      if (admins.length <= 1) return;
+      var idx = Number(btn.dataset.idx);
+      if (admins[idx] && (admins[idx].celular || "").replace(/\D/g, "") === currentCell) return;
+      if (admins[idx] && admins[idx].principal) return;
+      admins.splice(idx, 1);
+      saveJSON(ADMINS_KEY, admins);
+      renderAdminPanel();
+    }
+  });
+</script>
+</body>
+</html>
